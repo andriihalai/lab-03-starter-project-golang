@@ -1,11 +1,18 @@
-FROM golang:1.17-alpine
+FROM golang:1.21 AS builder
 
-WORKDIR /app
+WORKDIR /dir
 
 COPY . .
 
-RUN go build -o build/fizzbuzz
+# Download and install all dependencies
+RUN go mod download
 
-EXPOSE 8080
+# Build the binary statically
+RUN CGO_ENABLED=0 go build -o build/fizzbuzz
 
-CMD ["./build/fizzbuzz", "serve"]
+FROM scratch
+
+WORKDIR /app
+COPY --from=builder /dir/templates /app/templates
+COPY --from=builder /dir/build/fizzbuzz /app
+CMD ["./fizzbuzz", "serve"]
