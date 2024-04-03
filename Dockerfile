@@ -8,9 +8,9 @@ COPY . .
 RUN go mod download
 
 # Build the binary statically
-RUN CGO_ENABLED=0 go build -o build/fizzbuzz
+RUN go build -o build/fizzbuzz
 
-FROM scratch
+FROM gcr.io/distroless/base-debian12
 
 WORKDIR /app
 COPY --from=builder /dir/templates /app/templates
